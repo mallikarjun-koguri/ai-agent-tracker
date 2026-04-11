@@ -93,14 +93,11 @@ function transform(rows){
   rows.forEach(r=>{
     const name=(r['Agent Name']||'').trim();if(!name)return;
     const agentId=(r['Agent Id']||'').trim();
-    const result=(r['Testing Results']||r['Testing Result']||'').trim();
-    const tester=(r['Tested By']||'').trim();
-    const date=(r['Testing Date']||'').trim();
-    if(!agentId&&!result&&!tester&&!date){skipped++;return;}
+    if(!/^\d+$/.test(agentId)){skipped++;return;}
     if(!agents[name])agents[name]={id:name.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase(),name,agentId:agentId,client:(r['Client Name']||'').trim(),accountId:(r['Account ID']||'').trim(),channel:(r['Channel']||'').trim(),env:(r['Enviroment']||r['Environment']||'').trim(),promptLink:(r['Prompt Doc Link']||'').trim(),versions:{},testRuns:[]};
     const a=agents[name];
     const ver=(r['Prompt Version']||r['Version']||'v1.0').trim();
-    const run={date:date,tester:tester,result:result,failureReason:(r['Failiure Reason']||r['Failure Reason']||'').trim(),failureBucket:(r['Failure Bucketting']||r['Failure Bucket']||r['Failure Bucketing']||'').trim(),traces:(r['Traces']||'').trim(),version:ver};
+    const run={date:(r['Testing Date']||'').trim(),tester:(r['Tested By']||'').trim(),result:(r['Testing Results']||'').trim(),failureReason:(r['Failiure Reason']||r['Failure Reason']||'').trim(),failureBucket:(r['Failure Bucketting']||r['Failure Bucket']||r['Failure Bucketing']||'').trim(),traces:(r['Traces']||'').trim(),version:ver};
     a.testRuns.push(run);
     if(!a.versions[ver])a.versions[ver]={ver,changeSummary:(r['Change Summary']||'').trim(),runs:[]};
     a.versions[ver].runs.push(run);
