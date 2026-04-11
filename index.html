@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Agent Setup Tracker</title>
+<title>AI Agent Setup Tracker — Conversive O&I</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#fff;--bg2:#f6f5f3;--bg3:#edeceb;--tx:#1a1a1a;--tx2:#6b6b6b;--tx3:#999;--bd:rgba(0,0,0,.07);--bd2:rgba(0,0,0,.13);--green:#4a8c1c;--amber:#b06a0a;--red:#a32d2d;--purple:#534ab7;--blue:#185fa5;--teal:#1d9e75;--coral:#d85a30;--gray:#888}
@@ -16,17 +16,23 @@ h1{font-size:22px;font-weight:800;margin-bottom:2px}
 .filters button{padding:5px 11px;border-radius:8px;font-size:11px;font-weight:600;border:1px solid var(--bd);background:transparent;color:var(--tx2);cursor:pointer;font-family:inherit;transition:all .12s}
 .filters button:hover{border-color:var(--bd2)}
 .filters button.on{background:var(--bg2);color:var(--tx);border-color:var(--tx)}
-.card{background:var(--bg2);border-radius:12px;padding:13px 15px;margin-bottom:7px;border:1px solid var(--bd);cursor:pointer;transition:border-color .12s}
-.card:hover{border-color:var(--bd2)}
-.card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
-.card-title{font-size:14px;font-weight:700}
-.card-pills{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap}
-.card-foot{display:flex;gap:14px;font-size:11px;color:var(--tx3);margin-top:3px;flex-wrap:wrap}
-.tl{display:flex;align-items:center;margin:7px 0 3px}
+.ccard{background:var(--bg2);border-radius:12px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--bd)}
+.ccard-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.ccard-title{font-size:16px;font-weight:700}
+.ccard-meta{display:flex;gap:10px;font-size:11px;color:var(--tx3);margin-top:3px;flex-wrap:wrap;align-items:center}
+.agent-row{background:var(--bg);border-radius:8px;padding:10px 12px;margin-bottom:6px;border:1px solid var(--bd);cursor:pointer;transition:border-color .12s}
+.agent-row:hover{border-color:var(--bd2)}
+.agent-row:last-child{margin-bottom:0}
+.agent-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
+.agent-name{font-size:13px;font-weight:600}
+.agent-pills{display:flex;gap:4px;margin-top:3px}
+.agent-foot{display:flex;gap:12px;font-size:11px;color:var(--tx3);margin-top:2px}
+.tl{display:flex;align-items:center;margin:5px 0 2px}
 .dot{border-radius:50%;flex-shrink:0}
 .ln{height:2px;flex:1}
 .back{background:none;border:none;color:var(--tx2);cursor:pointer;font-size:13px;padding:4px 0;margin-bottom:10px;font-family:inherit}
-.dtitle{font-size:19px;font-weight:700;margin-bottom:6px}
+.dtitle{font-size:19px;font-weight:700;margin-bottom:4px}
+.dclient{font-size:13px;color:var(--tx2);margin-bottom:6px}
 .dpills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px}
 .slabels{display:flex;justify-content:space-between;font-size:9px;color:var(--tx3);margin-bottom:14px}
 .slabels span{text-align:center;flex:1}
@@ -37,7 +43,6 @@ h1{font-size:22px;font-weight:800;margin-bottom:2px}
 .mv{font-size:22px;font-weight:700;line-height:1.1}
 .mv.w{color:var(--amber)}
 .ml{font-size:11px;color:var(--tx2);margin-top:2px}
-.ms{font-size:10px;color:var(--tx3);margin-top:1px}
 .vc{background:var(--bg2);border-radius:10px;padding:12px 14px;margin-bottom:8px;border:1px solid var(--bd)}
 .vh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:4px}
 .vn{font-size:15px;font-weight:800}
@@ -46,7 +51,6 @@ h1{font-size:22px;font-weight:800;margin-bottom:2px}
 .tr2{display:grid;grid-template-columns:78px 90px 80px 1fr 50px;align-items:center;padding:5px 0;font-size:12px;border-bottom:1px solid var(--bd);color:var(--tx2)}
 .btr{width:100%;max-width:90px;height:5px;border-radius:3px;background:var(--bd);overflow:hidden;display:inline-block}
 .bfl{height:100%;border-radius:3px}
-.bw{display:flex;align-items:center;gap:6px}
 .bp{font-size:11px;font-weight:700;min-width:28px}
 .nd{font-size:11px;color:var(--tx3);font-style:italic;padding:4px 0}
 .pa{color:var(--green)}.fa{color:var(--red)}.pf{color:var(--amber)}
@@ -72,177 +76,122 @@ strong{font-weight:600}
 <body>
 <div id="app"></div>
 <script>
-const STAGES=[
-{id:"requirement",label:"Requirement",color:"#9c9a92"},
-{id:"configuration",label:"Configuration",color:"#534ab7"},
-{id:"testing",label:"Testing",color:"#185fa5"},
-{id:"tuning",label:"Tuning",color:"#1d9e75"},
-{id:"live",label:"Live",color:"#639922"},
-{id:"monitoring",label:"Monitoring",color:"#d85a30"}
-];
+const STAGES=[{id:"requirement",label:"Requirement",color:"#9c9a92"},{id:"configuration",label:"Configuration",color:"#534ab7"},{id:"testing",label:"Testing",color:"#185fa5"},{id:"tuning",label:"Tuning",color:"#1d9e75"},{id:"live",label:"Live",color:"#639922"},{id:"monitoring",label:"Monitoring",color:"#d85a30"}];
 const SM=Object.fromEntries(STAGES.map(s=>[s.id,s]));
+const SI=Object.fromEntries(STAGES.map((s,i)=>[s.id,i]));
 let SHEET_URL=localStorage.getItem('sheetUrl')||'';
-let allData=[],filter='all',selected=null,lastRefresh=null,error=null;
+let agents=[],customers=[],filter='all',selAgent=null,lastRefresh=null,error=null;
 
 function parseCSV(t){const ls=t.split('\n');if(ls.length<2)return[];const hs=csvLine(ls[0]);const rs=[];for(let i=1;i<ls.length;i++){if(!ls[i].trim())continue;const vs=csvLine(ls[i]);const o={};hs.forEach((h,j)=>{o[h.trim()]=(vs[j]||'').trim()});rs.push(o)}return rs}
 function csvLine(l){const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(q){if(ch==='"'&&l[i+1]==='"'){c+='"';i++}else if(ch==='"')q=false;else c+=ch}else{if(ch==='"')q=true;else if(ch===','){r.push(c);c=''}else c+=ch}}r.push(c);return r}
+function nk(s){return s.toLowerCase().replace(/[^a-z0-9]/g,'')}
+function makeGet(row){const c={};Object.keys(row).forEach(k=>{c[nk(k)]=row[k]});return function(){for(let i=0;i<arguments.length;i++){const v=c[nk(arguments[i])];if(v&&v.trim())return v.trim()}return ''}}
 
 function transform(rows){
-  const agents={};
-  let skipped=0;
-  rows.forEach(r=>{
-    const name=(r['Agent Name']||'').trim();if(!name)return;
-    const agentId=(r['Agent Id']||'').trim();
-    if(!/^\d+$/.test(agentId)){skipped++;return;}
-    if(!agents[name])agents[name]={id:name.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase(),name,agentId:agentId,client:(r['Client Name']||'').trim(),accountId:(r['Account ID']||'').trim(),channel:(r['Channel']||'').trim(),env:(r['Enviroment']||r['Environment']||'').trim(),promptLink:(r['Prompt Doc Link']||'').trim(),versions:{},testRuns:[]};
-    const a=agents[name];
-    const ver=(r['Prompt Version']||r['Version']||'v1.0').trim();
-    const run={date:(r['Testing Date']||'').trim(),tester:(r['Tested By']||'').trim(),result:(r['Testing Results']||'').trim(),failureReason:(r['Failiure Reason']||r['Failure Reason']||'').trim(),failureBucket:(r['Failure Bucketting']||r['Failure Bucket']||r['Failure Bucketing']||'').trim(),traces:(r['Traces']||'').trim(),version:ver};
-    a.testRuns.push(run);
-    if(!a.versions[ver])a.versions[ver]={ver,changeSummary:(r['Change Summary']||'').trim(),runs:[]};
-    a.versions[ver].runs.push(run);
-    if(r['Channel'])a.channel=r['Channel'].trim();
-    if(r['Lifecycle Stage'])a.explicitStage=r['Lifecycle Stage'].trim();
+  const am={};let sk=0;
+  rows.forEach(row=>{
+    const g=makeGet(row);
+    const name=g('Agent Name');if(!name)return;
+    const agentId=g('Agent Id');if(!/^\d+$/.test(agentId)){sk++;return;}
+    if(!am[name])am[name]={id:name.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase(),name,agentId,client:g('Client Name'),accountId:g('Account ID'),channel:g('Channel'),env:g('Enviroment','Environment'),promptLink:g('Prompt Doc Link'),versions:{},testRuns:[]};
+    const a=am[name];
+    const ver=g('Prompt Version','Version')||'v1.0';
+    a.testRuns.push({date:g('Testing Date'),tester:g('Tested By'),result:g('Testing Results','Testing Result'),failureReason:g('Failiure Reason','Failure Reason'),failureBucket:g('Failure Bucketting','Failure Bucketing','Failure Bucket'),traces:g('Traces'),version:ver});
+    if(!a.versions[ver])a.versions[ver]={ver,changeSummary:g('Change Summary'),runs:[]};
+    a.versions[ver].runs.push(a.testRuns[a.testRuns.length-1]);
+    const ch=g('Channel');if(ch)a.channel=ch;
+    const cl=g('Client Name');if(cl)a.client=cl;
+    const ev=g('Enviroment','Environment');if(ev)a.env=ev;
+    const ai=g('Account ID');if(ai)a.accountId=ai;
+    const pl=g('Prompt Doc Link');if(pl)a.promptLink=pl;
+    const ls=g('Lifecycle Stage');if(ls)a.explicitStage=ls;
   });
-  console.log('Parsed rows:',rows.length,'Skipped:',skipped,'Agents found:',Object.keys(agents).length);
-  console.log('Headers in first row:',rows.length>0?Object.keys(rows[0]).join(', '):'(none)');
-  console.log('Agent names:',Object.keys(agents).join(', '));
-  return Object.values(agents).map(a=>{
-    const total=a.testRuns.length;
-    const passed=a.testRuns.filter(r=>r.result==='Passed').length;
-    const failed=a.testRuns.filter(r=>r.result==='Failed').length;
-    const partial=a.testRuns.filter(r=>r.result==='Partially Failed').length;
+  agents=Object.values(am).map(a=>{
+    const t=a.testRuns.length,p=a.testRuns.filter(r=>r.result==='Passed').length,f=a.testRuns.filter(r=>r.result==='Failed').length,pf=a.testRuns.filter(r=>r.result==='Partially Failed').length;
     const fc={};a.testRuns.forEach(r=>{if(r.failureBucket)fc[r.failureBucket]=(fc[r.failureBucket]||0)+1});
     const vl=Object.values(a.versions).map(v=>{const vt=v.runs.length;return{...v,total:vt,passed:v.runs.filter(r=>r.result==='Passed').length,failed:v.runs.filter(r=>r.result==='Failed').length,partial:v.runs.filter(r=>r.result==='Partially Failed').length}});
     let stage=a.explicitStage||'';
-    if(!stage||!SM[stage]){
-      const pr=total>0?passed/total:0;
-      if(total===0)stage='configuration';
-      else if(pr>=0.8)stage='live';
-      else if(pr>=0.5)stage='tuning';
-      else stage='testing';
-    }
-    return{...a,total,passed,failed,partial,passRate:total>0?Math.round(passed/total*100):0,failureCounts:fc,versionList:vl,stage};
+    if(!stage||!SM[stage]){const pr=t>0?p/t:0;if(t===0)stage='configuration';else if(pr>=0.8)stage='live';else if(pr>=0.5)stage='tuning';else stage='testing';}
+    return{...a,total:t,passed:p,failed:f,partial:pf,passRate:t>0?Math.round(p/t*100):0,failureCounts:fc,versionList:vl,stage};
   });
+  const cm={};
+  agents.forEach(a=>{const cl=a.client||'Unknown';if(!cm[cl])cm[cl]={name:cl,id:cl.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase(),agents:[],env:a.env,accountId:a.accountId};cm[cl].agents.push(a);if(a.env)cm[cl].env=a.env;if(a.accountId)cm[cl].accountId=a.accountId});
+  customers=Object.values(cm).map(c=>{const tr=c.agents.reduce((s,a)=>s+a.total,0);const tp=c.agents.reduce((s,a)=>s+a.passed,0);return{...c,totalRuns:tr,overallPass:tr>0?Math.round(tp/tr*100):0}});
 }
 
 async function fetchData(){
-  if(!SHEET_URL){allData=[];render();return}
-  try{error=null;const res=await fetch(SHEET_URL);if(!res.ok)throw new Error('HTTP '+res.status);const text=await res.text();allData=transform(parseCSV(text));lastRefresh=new Date().toLocaleTimeString()}catch(e){error=e.message;allData=[]}
+  if(!SHEET_URL){agents=[];customers=[];render();return}
+  try{error=null;const res=await fetch(SHEET_URL);if(!res.ok)throw new Error('HTTP '+res.status);transform(parseCSV(await res.text()));lastRefresh=new Date().toLocaleTimeString()}catch(e){error=e.message;agents=[];customers=[]}
   render();
 }
 
-function pill(t,c){return`<span class="pill" style="background:${c}18;color:${c}">${t}</span>`}
-function timeline(sid){
-  const idx=STAGES.findIndex(s=>s.id===sid);
-  let h='<div class="tl">';
-  STAGES.forEach((s,i)=>{const a=i<=idx,cur=i===idx;const sz=cur?13:9;
-    h+=`<div style="display:flex;align-items:center;${i<STAGES.length-1?'flex:1':''}"><div class="dot" style="width:${sz}px;height:${sz}px;background:${a?s.color:'var(--bd)'};border:${cur?'2px solid '+s.color:'none'};box-shadow:${cur?'0 0 0 3px '+s.color+'25':'none'}" title="${s.label}"></div>`;
-    if(i<STAGES.length-1){h+=`<div class="ln" style="background:${i<idx?STAGES[i+1].color:'var(--bd)'}"></div>`}h+='</div>'});
-  return h+'</div>';
-}
-function testRow(r){
-  const cls=r.result==='Passed'?'pa':r.result==='Failed'?'fa':'pf';
-  return`<div class="tr2"><span style="font-size:11px">${r.date?r.date.toString().slice(0,10):''}</span><span class="${cls}" style="font-weight:600">${r.result||''}</span><span>${r.tester}</span><span style="font-size:11px;color:var(--tx3)">${r.failureBucket||'\u2014'}</span><span style="font-size:11px">${r.traces?'\u2713':'\u2014'}</span></div>`;
-}
+function pill(t,c){return'<span class="pill" style="background:'+c+'18;color:'+c+'">'+t+'</span>'}
+function timeline(sid){const idx=STAGES.findIndex(s=>s.id===sid);let h='<div class="tl">';STAGES.forEach((s,i)=>{const a=i<=idx,cur=i===idx,sz=cur?12:8;h+='<div style="display:flex;align-items:center;'+(i<STAGES.length-1?'flex:1':'')+'"><div class="dot" style="width:'+sz+'px;height:'+sz+'px;background:'+(a?s.color:'var(--bd)')+';border:'+(cur?'2px solid '+s.color:'none')+';box-shadow:'+(cur?'0 0 0 3px '+s.color+'25':'none')+'" title="'+s.label+'"></div>';if(i<STAGES.length-1)h+='<div class="ln" style="background:'+(i<idx?STAGES[i+1].color:'var(--bd)')+'"></div>';h+='</div>'});return h+'</div>'}
+function testRow(r){const cls=r.result==='Passed'?'pa':r.result==='Failed'?'fa':'pf';return'<div class="tr2"><span style="font-size:11px">'+(r.date||'')+'</span><span class="'+cls+'" style="font-weight:600">'+(r.result||'')+'</span><span>'+r.tester+'</span><span style="font-size:11px;color:var(--tx3)">'+(r.failureBucket||'\u2014')+'</span><span style="font-size:11px">'+(r.traces?'\u2713':'\u2014')+'</span></div>'}
+function mc(l,v,sub,w,cls){return'<div class="mc'+(w?' w':'')+'"><div class="mv'+(w?' w':'')+(cls?' '+cls:'')+'">'+ v+'</div><div class="ml">'+l+'</div>'+(sub?'<div class="ms">'+sub+'</div>':'')+'</div>'}
 
 function renderSetup(){
-  return`<h1>AI agent setup tracker</h1><p class="sub">Live dashboard powered by your Google Sheet</p>
-  <div class="setup"><h2>Connect your Google Sheet</h2>
-  <p>This dashboard reads directly from your AI Testing Sheet. No backend needed \u2014 it fetches the published CSV every time you open or refresh.</p>
-  <ol><li>Open your AI Testing Sheet in Google Sheets</li><li>Go to <strong>File \u2192 Share \u2192 Publish to web</strong></li><li>Select the <strong>Test Runs</strong> tab and choose <strong>CSV</strong> format</li><li>Click <strong>Publish</strong> and copy the URL</li><li>Paste it below</li></ol>
-  <input type="text" id="urlInput" placeholder="Paste your Google Sheets CSV URL here..." value="${SHEET_URL}">
-  <button class="btn" onclick="saveUrl()">Connect & load data</button>
-  <p style="margin-top:10px;font-size:11px;color:var(--tx3)">Saved in your browser. You only do this once per device.</p></div>
-  <div class="setup"><h2>Required sheet columns</h2>
-  <p>Your existing columns work as-is. For version tracking, add these 3 columns:</p>
-  <table style="border-collapse:collapse;font-size:12px;width:100%;margin-top:10px">
-  <tr style="background:var(--bg3)"><th style="padding:6px 10px;text-align:left;border:1px solid var(--bd);font-weight:600">Column</th><th style="padding:6px 10px;text-align:left;border:1px solid var(--bd);font-weight:600">Purpose</th><th style="padding:6px 10px;text-align:left;border:1px solid var(--bd);font-weight:600">Values</th></tr>
-  <tr><td style="padding:6px 10px;border:1px solid var(--bd)"><code>Prompt Version</code></td><td style="padding:6px 10px;border:1px solid var(--bd)">Groups test runs by version</td><td style="padding:6px 10px;border:1px solid var(--bd)">v1.0, v1.1, v2.0</td></tr>
-  <tr><td style="padding:6px 10px;border:1px solid var(--bd)"><code>Lifecycle Stage</code></td><td style="padding:6px 10px;border:1px solid var(--bd)">Where the agent is now</td><td style="padding:6px 10px;border:1px solid var(--bd)">requirement, configuration, testing, tuning, live, monitoring</td></tr>
-  <tr><td style="padding:6px 10px;border:1px solid var(--bd)"><code>Change Summary</code></td><td style="padding:6px 10px;border:1px solid var(--bd)">What changed in this version</td><td style="padding:6px 10px;border:1px solid var(--bd)">e.g. "Fixed language detection"</td></tr>
-  </table></div>`;
+  return'<h1>AI agent setup tracker</h1><p class="sub">Live dashboard powered by your Google Sheet</p><div class="setup"><h2>Connect your Google Sheet</h2><p>This dashboard reads directly from your AI Testing Sheet. No backend needed.</p><ol><li>Open your AI Testing Sheet in Google Sheets</li><li>Go to <strong>File \u2192 Share \u2192 Publish to web</strong></li><li>Select the <strong>Test Runs</strong> tab and choose <strong>CSV</strong> format</li><li>Click <strong>Publish</strong> and copy the URL</li><li>Paste it below</li></ol><input type="text" id="urlInput" placeholder="Paste your Google Sheets CSV URL here..." value="'+SHEET_URL+'"><button class="btn" onclick="saveUrl()">Connect & load data</button><p style="margin-top:10px;font-size:11px;color:var(--tx3)">Saved in your browser. You only do this once per device.</p></div>';
 }
 
 function renderList(){
-  const ps=filter==='all'?allData:allData.filter(a=>a.stage===filter);
-  const counts=STAGES.map(s=>({...s,count:allData.filter(a=>a.stage===s.id).length}));
-  const liveN=allData.filter(a=>['live','monitoring'].includes(a.stage)).length;
-  const totalR=allData.reduce((s,a)=>s+a.total,0);
-  let h=`<h1>AI agent setup tracker</h1><p class="sub">${allData.length} agents \u00B7 ${liveN} live \u00B7 ${totalR} test runs</p>`;
-  if(lastRefresh)h+=`<div class="refresh">Last refreshed: ${lastRefresh}<button onclick="fetchData()">\u21BB Refresh</button><button onclick="SHEET_URL='';localStorage.removeItem('sheetUrl');render()" style="margin-left:4px">\u2699 Change sheet</button></div>`;
-  if(error)h+=`<div class="err">Error: ${error}. Check that your sheet is published as CSV.</div>`;
-  h+=`<div class="filters"><button class="${filter==='all'?'on':''}" onclick="filter='all';render()">All (${allData.length})</button>`;
-  counts.forEach(s=>{const on=filter===s.id;h+=`<button class="${on?'on':''}" style="${on?'border-color:'+s.color+';background:'+s.color+'12;color:'+s.color:''}" onclick="filter='${s.id}';render()">${s.label}${s.count?' ('+s.count+')':''}</button>`});
+  const cs=filter==='all'?customers:customers.filter(c=>c.agents.some(a=>a.stage===filter));
+  const counts=STAGES.map(s=>({...s,count:agents.filter(a=>a.stage===s.id).length}));
+  const liveN=agents.filter(a=>['live','monitoring'].includes(a.stage)).length;
+  const totalR=agents.reduce((s,a)=>s+a.total,0);
+  let h='<h1>AI agent setup tracker</h1><p class="sub">'+customers.length+' customers \u00B7 '+agents.length+' agents \u00B7 '+liveN+' live \u00B7 '+totalR+' test runs</p>';
+  if(lastRefresh)h+='<div class="refresh">Last refreshed: '+lastRefresh+'<button onclick="fetchData()">\u21BB Refresh</button><button onclick="SHEET_URL=\'\';localStorage.removeItem(\'sheetUrl\');render()" style="margin-left:4px">\u2699 Change sheet</button></div>';
+  if(error)h+='<div class="err">Error: '+error+'</div>';
+  h+='<div class="filters"><button class="'+(filter==='all'?'on':'')+'" onclick="filter=\'all\';render()">All ('+customers.length+')</button>';
+  counts.forEach(s=>{const on=filter===s.id;h+='<button class="'+(on?'on':'')+'" style="'+(on?'border-color:'+s.color+';background:'+s.color+'12;color:'+s.color:'')+'" onclick="filter=\''+s.id+'\';render()">'+s.label+(s.count?' ('+s.count+')':'')+'</button>'});
   h+='</div>';
-  if(!ps.length)h+=`<div class="nd" style="padding:20px;text-align:center">No agents${filter!=='all'?' in this stage':''}.</div>`;
-  ps.forEach(a=>{
-    const st=SM[a.stage]||SM.testing;const pc=a.passRate>=80?'var(--green)':a.passRate>=50?'var(--amber)':'var(--red)';
-    h+=`<div class="card" onclick="selected='${a.id}';render()"><div class="card-head"><div><div class="card-title">${a.name}</div><div class="card-pills">${pill(a.channel||'?',a.channel==='Voice'?'#534ab7':'#185fa5')} ${pill(a.client||'N/A','#5F5E5A')} ${a.env?pill(a.env,'#1d9e75'):''}</div></div>${pill(st.label,st.color)}</div>${timeline(a.stage)}<div class="card-foot"><span>${a.versionList.length} ver${a.versionList.length!==1?'s':''}</span><span>${a.total} run${a.total!==1?'s':''}</span><span>Pass: <strong style="color:${pc}">${a.passRate}%</strong> (${a.passed}P / ${a.partial}PF / ${a.failed}F)</span></div></div>`;
+  if(!cs.length){h+='<div class="nd" style="padding:20px;text-align:center">No customers'+(filter!=='all'?' with agents in this stage':'')+'.</div>';return h}
+  cs.forEach(c=>{
+    const pc=c.overallPass>=80?'var(--green)':c.overallPass>=50?'var(--amber)':'var(--red)';
+    h+='<div class="ccard"><div class="ccard-head"><div><div class="ccard-title">'+c.name+'</div><div class="ccard-meta">'+(c.env?pill(c.env,'#1d9e75'):'')+' <span>'+c.agents.length+' agent'+(c.agents.length!==1?'s':'')+'</span><span>'+c.totalRuns+' run'+(c.totalRuns!==1?'s':'')+'</span><span>Overall: <strong style="color:'+pc+'">'+c.overallPass+'%</strong> pass</span></div></div></div>';
+    const show=filter==='all'?c.agents:c.agents.filter(a=>a.stage===filter);
+    show.forEach(a=>{
+      const st=SM[a.stage]||SM.testing;const apc=a.passRate>=80?'var(--green)':a.passRate>=50?'var(--amber)':'var(--red)';
+      h+='<div class="agent-row" onclick="selAgent=\''+a.id+'\';render()"><div class="agent-head"><div><div class="agent-name">'+a.name+'</div><div class="agent-pills">'+pill(a.channel||'?',a.channel==='Voice'?'#534ab7':'#185fa5')+' '+pill('Agent #'+a.agentId,'#888')+'</div></div>'+pill(st.label,st.color)+'</div>'+timeline(a.stage)+'<div class="agent-foot"><span>'+a.versionList.length+' ver'+(a.versionList.length!==1?'s':'')+'</span><span>'+a.total+' run'+(a.total!==1?'s':'')+'</span><span>Pass: <strong style="color:'+apc+'">'+a.passRate+'%</strong> ('+a.passed+'P / '+a.partial+'PF / '+a.failed+'F)</span></div></div>';
+    });
+    h+='</div>';
   });
   return h;
 }
 
 function renderDetail(){
-  const a=allData.find(x=>x.id===selected);if(!a){selected=null;return renderList()}
+  const a=agents.find(x=>x.id===selAgent);if(!a){selAgent=null;return renderList()}
   const st=SM[a.stage]||SM.testing;
-  let h=`<button class="back" onclick="selected=null;render()">\u2190 Back to all agents</button>`;
-  h+=`<div class="dtitle">${a.name}</div><div class="dpills">${pill(a.channel||'?',a.channel==='Voice'?'#534ab7':'#185fa5')} ${pill(a.client||'N/A','#5F5E5A')} ${a.env?pill(a.env,'#1d9e75'):''} ${pill('Agent #'+a.agentId,'#888')} ${pill(st.label,st.color)} ${a.promptLink?'<a href="'+a.promptLink+'" target="_blank" style="font-size:11px;color:var(--blue)">Prompt doc</a>':''}</div>`;
+  let h='<button class="back" onclick="selAgent=null;render()">\u2190 Back to '+a.client+'</button>';
+  h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px"><div><div class="dtitle">'+a.name+'</div><div class="dclient">'+a.client+'</div></div>'+pill(st.label,st.color)+'</div>';
+  h+='<div class="dpills">'+pill(a.channel||'?',a.channel==='Voice'?'#534ab7':'#185fa5')+' '+(a.env?pill(a.env,'#1d9e75')+' ':'')+pill('Agent #'+a.agentId,'#888')+' '+(a.accountId?pill('Acc: '+a.accountId,'#5F5E5A')+' ':'')+(a.promptLink?'<a href="'+a.promptLink+'" target="_blank" style="font-size:11px;color:#185fa5">Prompt doc</a>':'')+'</div>';
   h+=timeline(a.stage);
-  h+=`<div class="slabels">${STAGES.map(s=>`<span>${s.label}</span>`).join('')}</div>`;
-
-  // Summary
-  h+=`<div class="stitle">Test summary</div><div class="mgrid">`;
-  h+=mc('Total runs',a.total);h+=mc('Passed',a.passed,0,0,'pa');h+=mc('Partial',a.partial,0,0,'pf');h+=mc('Failed',a.failed,0,0,'fa');
-  h+=`<div class="mc${a.passRate<50?' w':''}"><div class="mv${a.passRate<50?' w':''}">${a.passRate}%</div><div class="ml">Pass rate</div></div>`;
-  h+='</div>';
-
-  // Version-over-version trend
+  h+='<div class="slabels">'+STAGES.map(s=>'<span>'+s.label+'</span>').join('')+'</div>';
+  h+='<div class="stitle">Test summary</div><div class="mgrid">';
+  h+=mc('Total runs',a.total)+mc('Passed',a.passed,0,0,'pa')+mc('Partial',a.partial,0,0,'pf')+mc('Failed',a.failed,0,0,'fa');
+  h+='<div class="mc'+(a.passRate<50?' w':'')+'"><div class="mv'+(a.passRate<50?' w':'')+'">'+a.passRate+'%</div><div class="ml">Pass rate</div></div></div>';
   if(a.versionList.length>1){
-    h+=`<div class="stitle">Version trend \u2014 is the agent getting better?</div><div style="margin-bottom:18px">`;
-    a.versionList.forEach(v=>{
-      const pr=v.total>0?Math.round(v.passed/v.total*100):0;
-      const c=pr>=80?'var(--green)':pr>=50?'var(--amber)':'var(--red)';
-      h+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;font-size:12px"><span style="min-width:40px;font-weight:700">${v.ver}</span><div class="btr" style="max-width:200px"><div class="bfl" style="width:${pr}%;background:${c}"></div></div><span class="bp" style="color:${c}">${pr}%</span><span style="color:var(--tx3)">${v.total} runs</span>${v.changeSummary?'<span style="color:var(--tx3);font-size:11px">\u2014 '+v.changeSummary+'</span>':''}</div>`;
-    });
+    h+='<div class="stitle">Version trend</div><div style="margin-bottom:18px">';
+    a.versionList.forEach(v=>{const pr=v.total>0?Math.round(v.passed/v.total*100):0;const vc=pr>=80?'var(--green)':pr>=50?'var(--amber)':'var(--red)';
+    h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;font-size:12px"><span style="min-width:40px;font-weight:700">'+v.ver+'</span><div class="btr" style="max-width:200px"><div class="bfl" style="width:'+pr+'%;background:'+vc+'"></div></div><span class="bp" style="color:'+vc+'">'+pr+'%</span><span style="color:var(--tx3)">'+v.total+' runs</span>'+(v.changeSummary?'<span style="color:var(--tx3);font-size:11px">\u2014 '+v.changeSummary+'</span>':'')+'</div>'});
     h+='</div>';
   }
-
-  // Failure breakdown
   const fb=Object.entries(a.failureCounts).sort((x,y)=>y[1]-x[1]);
-  if(fb.length){
-    const denom=a.failed+a.partial||1;
-    h+=`<div class="stitle">Failure breakdown \u2014 what keeps repeating?</div><div style="margin-bottom:18px">`;
-    fb.forEach(([b,n])=>{const p=Math.round(n/denom*100);h+=`<div class="fb-row"><span class="fb-label">${b}</span><div class="fb-bar"><div class="fb-fill" style="width:${p}%"></div></div><span class="fb-count">${n} (${p}%)</span></div>`});
-    h+='</div>';
-  }
-
-  // Version history
+  if(fb.length){const dn=a.failed+a.partial||1;h+='<div class="stitle">Failure breakdown</div><div style="margin-bottom:18px">';fb.forEach(([b,n])=>{const p=Math.round(n/dn*100);h+='<div class="fb-row"><span class="fb-label">'+b+'</span><div class="fb-bar"><div class="fb-fill" style="width:'+p+'%"></div></div><span class="fb-count">'+n+' ('+p+'%)</span></div>'});h+='</div>'}
   const allR=a.versionList.reduce((s,v)=>s+v.total,0);
-  h+=`<div class="stitle">Version history \u00B7 ${a.versionList.length} versions \u00B7 ${allR} test runs</div>`;
-  if(!a.versionList.length)h+=`<div class="nd">No versions yet</div>`;
+  h+='<div class="stitle">Version history \u00B7 '+a.versionList.length+' versions \u00B7 '+allR+' test runs</div>';
+  if(!a.versionList.length)h+='<div class="nd">No versions yet</div>';
   [...a.versionList].reverse().forEach(v=>{
-    const pr=v.total>0?Math.round(v.passed/v.total*100):0;const c=pr>=80?'var(--green)':pr>=50?'var(--amber)':'var(--red)';
-    h+=`<div class="vc"><div class="vh"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="vn">${v.ver}</span><span style="font-size:11px;font-weight:700;color:${c}">${pr}% pass</span><span style="font-size:11px;color:var(--tx3)">(${v.passed}P / ${v.partial}PF / ${v.failed}F of ${v.total})</span></div></div>`;
-    if(v.changeSummary)h+=`<div class="vd"><strong>Change:</strong> ${v.changeSummary}</div>`;
-    if(v.runs.length){
-      h+=`<div class="th2"><span>Date</span><span>Result</span><span>Tester</span><span>Failure type</span><span>Trace</span></div>`;
-      v.runs.forEach(r=>{h+=testRow(r)});
-    }else h+=`<div class="nd">No test runs yet</div>`;
-    h+='</div>';
-  });
+    const pr=v.total>0?Math.round(v.passed/v.total*100):0;const vc=pr>=80?'var(--green)':pr>=50?'var(--amber)':'var(--red)';
+    h+='<div class="vc"><div class="vh"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="vn">'+v.ver+'</span><span style="font-size:11px;font-weight:700;color:'+vc+'">'+pr+'% pass</span><span style="font-size:11px;color:var(--tx3)">('+v.passed+'P / '+v.partial+'PF / '+v.failed+'F of '+v.total+')</span></div></div>';
+    if(v.changeSummary)h+='<div class="vd"><strong>Change:</strong> '+v.changeSummary+'</div>';
+    if(v.runs.length){h+='<div class="th2"><span>Date</span><span>Result</span><span>Tester</span><span>Failure type</span><span>Trace</span></div>';v.runs.forEach(r=>{h+=testRow(r)})}else h+='<div class="nd">No test runs yet</div>';
+    h+='</div>'});
   return h;
 }
 
-function mc(l,v,sub,w,cls){return`<div class="mc${w?' w':''}"><div class="mv${w?' w':''}${cls?' '+cls:''}">${v}</div><div class="ml">${l}</div>${sub?'<div class="ms">'+sub+'</div>':''}</div>`}
-
-function render(){
-  const app=document.getElementById('app');
-  if(!SHEET_URL)app.innerHTML=renderSetup();
-  else if(selected)app.innerHTML=renderDetail();
-  else app.innerHTML=renderList();
-}
-function saveUrl(){const u=document.getElementById('urlInput').value.trim();if(u){SHEET_URL=u;localStorage.setItem('sheetUrl',u);document.getElementById('app').innerHTML='<div class="loading">Loading data from Google Sheet...</div>';fetchData()}}
+function render(){const app=document.getElementById('app');if(!SHEET_URL)app.innerHTML=renderSetup();else if(selAgent)app.innerHTML=renderDetail();else app.innerHTML=renderList()}
+function saveUrl(){const u=document.getElementById('urlInput').value.trim();if(u){SHEET_URL=u;localStorage.setItem('sheetUrl',u);document.getElementById('app').innerHTML='<div class="loading">Loading...</div>';fetchData()}}
 if(SHEET_URL){document.getElementById('app').innerHTML='<div class="loading">Loading...</div>';fetchData()}else render();
 </script>
 </body>
