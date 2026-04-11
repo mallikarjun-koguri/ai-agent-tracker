@@ -88,10 +88,14 @@ function parseCSV(t){const ls=t.split('\n');if(ls.length<2)return[];const hs=csv
 function csvLine(l){const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(q){if(ch==='"'&&l[i+1]==='"'){c+='"';i++}else if(ch==='"')q=false;else c+=ch}else{if(ch==='"')q=true;else if(ch===','){r.push(c);c=''}else c+=ch}}r.push(c);return r}
 
 function transform(rows){
+  const validResults=['Passed','Failed','Partially Failed'];
   const agents={};
   rows.forEach(r=>{
     const name=r['Agent Name'];if(!name)return;
-    if(!agents[name])agents[name]={id:name.replace(/\s+/g,'_').toLowerCase(),name,agentId:r['Agent Id']||'',client:r['Client Name']||'',accountId:r['Account ID']||'',channel:r['Channel']||'',env:r['Enviroment']||r['Environment']||'',promptLink:r['Prompt Doc Link']||'',versions:{},testRuns:[]};
+    const result=r['Testing Results']||'';
+    const agentId=r['Agent Id']||'';
+    if(!validResults.includes(result)&&!agentId.match(/^\d+$/))return;
+    if(!agents[name])agents[name]={id:name.replace(/\s+/g,'_').toLowerCase(),name,agentId:agentId,client:r['Client Name']||'',accountId:r['Account ID']||'',channel:r['Channel']||'',env:r['Enviroment']||r['Environment']||'',promptLink:r['Prompt Doc Link']||'',versions:{},testRuns:[]};
     const a=agents[name];
     const ver=r['Prompt Version']||r['Version']||'v1.0';
     const result=r['Testing Results']||'';
