@@ -111,11 +111,11 @@ function renderDetail(){
   h+='<div class="mc'+(a.passRate<50?' w':'')+'"><div class="mv'+(a.passRate<50?' w':'')+'">'+a.passRate+'%</div><div class="ml">Pass rate</div></div></div>';
   var ttKeys=Object.keys(a.testTypeCounts);
   if(ttKeys.length>0){
-    var targets={'Happy Path':{target:20,color:'var(--green)'},'Edge Case':{target:30,color:'var(--blue)'},'Error Handling':{target:25,color:'var(--amber)'},'Adversarial':{target:15,color:'var(--red)'},'Regression':{target:10,color:'var(--purple)'}};
-    h+='<div class="stitle">Test coverage \u2014 are you testing enough scenarios?</div><div style="margin-bottom:18px">';
-    var allTypes=['Happy Path','Edge Case','Error Handling','Adversarial','Regression'];
-    allTypes.forEach(function(tt){var cnt=a.testTypeCounts[tt]||0;var pct=a.total>0?Math.round(cnt/a.total*100):0;var tgt=targets[tt]||{target:20,color:'var(--gray)'};var isLow=pct<tgt.target&&a.total>=5;
-      h+='<div class="fb-row"><span class="fb-label" style="'+(isLow?'color:var(--red)':'')+'">'+(isLow?'\u26A0 ':'')+tt+'</span><div class="fb-bar"><div class="fb-fill" style="width:'+pct+'%;background:'+tgt.color+'"></div></div><span class="fb-count" style="'+(isLow?'color:var(--red)':'')+'">'+cnt+' ('+pct+'%)</span><span style="font-size:10px;color:var(--tx3);min-width:60px;text-align:right">target: '+tgt.target+'%</span></div>'});
+    var colors={'Happy Path':'var(--green)','Edge Case':'var(--blue)','Error Handling':'var(--amber)','Guardrail':'var(--red)','Regression':'var(--purple)'};
+    h+='<div class="stitle">Test coverage</div><div style="margin-bottom:18px">';
+    var allTypes=['Happy Path','Edge Case','Error Handling','Guardrail','Regression'];
+    allTypes.forEach(function(tt){var cnt=a.testTypeCounts[tt]||0;var pct=a.total>0?Math.round(cnt/a.total*100):0;var clr=colors[tt]||'var(--gray)';
+      h+='<div class="fb-row"><span class="fb-label">'+tt+'</span><div class="fb-bar"><div class="fb-fill" style="width:'+Math.min(pct,100)+'%;background:'+clr+'"></div></div><span class="fb-count">'+cnt+' ('+pct+'%)</span></div>'});
     h+='</div>';
   }
   if(a.versionList.length>1){h+='<div class="stitle">Version trend</div><div style="margin-bottom:18px">';
