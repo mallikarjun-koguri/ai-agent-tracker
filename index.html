@@ -54,13 +54,14 @@ function makeGet(row){const c={};Object.keys(row).forEach(k=>{c[nk(k)]=row[k]});
 function transform(rows){
   const am={};let sk=0;
   rows.forEach(row=>{const g=makeGet(row);const name=g('Agent Name');if(!name)return;const agentId=g('Agent Id');if(!/^\d+$/.test(agentId)){sk++;return;}
-    if(!am[name])am[name]={id:name.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase(),name,agentId,client:g('Client Name'),accountId:g('Account ID'),channel:g('Channel'),env:g('Enviroment','Environment'),promptLink:g('Prompt Doc Link'),journey:g('Journey Name','Journey'),agentType:g('Agent Type'),versions:{},testRuns:[]};
+    if(!am[name])am[name]={id:name.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase(),name,agentId,client:g('Client Name'),accountId:g('Account ID'),channel:g('Channel'),env:g('Enviroment','Environment'),promptLink:g('Prompt Doc Link'),journey:g('Journey Name','Journey'),agentType:g('Agent Type'),jiraKey:g('Jira Epic Key','Jira Epic','Jira Key','Epic Key'),versions:{},testRuns:[]};
     const a=am[name];const ver=g('Prompt Version','Version')||'v1.0';
     a.testRuns.push({date:g('Testing Date'),tester:g('Tested By'),result:g('Testing Results','Testing Result'),testType:g('Test Type'),failureReason:g('Failiure Reason','Failure Reason'),failureBucket:g('Failure Bucketting','Failure Bucketing','Failure Bucket'),traces:g('Traces'),version:ver});
     if(!a.versions[ver])a.versions[ver]={ver,changeSummary:g('Change Summary'),runs:[]};a.versions[ver].runs.push(a.testRuns[a.testRuns.length-1]);
     const ch=g('Channel');if(ch)a.channel=ch;const cl=g('Client Name');if(cl)a.client=cl;const ev=g('Enviroment','Environment');if(ev)a.env=ev;
     const ai=g('Account ID');if(ai)a.accountId=ai;const pl=g('Prompt Doc Link');if(pl)a.promptLink=pl;const ls=g('Lifecycle Stage');if(ls)a.explicitStage=ls;
     const jn=g('Journey Name','Journey');if(jn)a.journey=jn;const at=g('Agent Type');if(at)a.agentType=at;
+    const jk=g('Jira Epic Key','Jira Epic','Jira Key','Epic Key');if(jk)a.jiraKey=jk;
   });
   agents=Object.values(am).map(a=>{const t=a.testRuns.length,p=a.testRuns.filter(r=>r.result==='Passed').length,f=a.testRuns.filter(r=>r.result==='Failed').length,pf=a.testRuns.filter(r=>r.result==='Partially Failed').length;
     const fc={};a.testRuns.forEach(r=>{if(r.failureBucket)fc[r.failureBucket]=(fc[r.failureBucket]||0)+1});
@@ -69,8 +70,8 @@ function transform(rows){
     let stage=a.explicitStage||'';if(!stage||!SM[stage]){const pr=t>0?p/t:0;if(t===0)stage='configuration';else if(pr>=0.8)stage='live';else if(pr>=0.5)stage='tuning';else stage='testing';}
     return{...a,total:t,passed:p,failed:f,partial:pf,passRate:t>0?Math.round(p/t*100):0,failureCounts:fc,testTypeCounts:tc,versionList:vl,stage};});
   const cm={};
-  agents.forEach(a=>{const cl=a.client||'Unknown';if(!cm[cl])cm[cl]={name:cl,id:cl.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase(),journeys:{},standaloneAgents:[],env:a.env,accountId:a.accountId};
-    const c=cm[cl];if(a.env)c.env=a.env;if(a.accountId)c.accountId=a.accountId;
+  agents.forEach(a=>{const cl=a.client||'Unknown';if(!cm[cl])cm[cl]={name:cl,id:cl.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase(),journeys:{},standaloneAgents:[],env:a.env,accountId:a.accountId,jiraKey:a.jiraKey};
+    const c=cm[cl];if(a.env)c.env=a.env;if(a.accountId)c.accountId=a.accountId;if(a.jiraKey)c.jiraKey=a.jiraKey;
     if(a.journey){if(!c.journeys[a.journey])c.journeys[a.journey]={name:a.journey,agents:[]};c.journeys[a.journey].agents.push(a)}else{c.standaloneAgents.push(a)}});
   customers=Object.values(cm).map(c=>{const jList=Object.values(c.journeys).map(j=>{const tr=j.agents.reduce((s,a)=>s+a.total,0);const tp=j.agents.reduce((s,a)=>s+a.passed,0);
     const so=['requirement','configuration','testing','tuning','live','monitoring'];let wi=5;j.agents.forEach(a=>{const si=so.indexOf(a.stage);if(si>=0&&si<wi)wi=si});
@@ -96,7 +97,7 @@ function renderList(){
   counts.forEach(s=>{const on=filter===s.id;h+='<button class="'+(on?'on':'')+'" style="'+(on?'border-color:'+s.color+';background:'+s.color+'12;color:'+s.color:'')+'" onclick="filter=\''+s.id+'\';render()">'+s.label+(s.count?' ('+s.count+')':'')+'</button>'});h+='</div>';
   if(!cs.length){h+='<div class="nd" style="padding:20px;text-align:center">No customers'+(filter!=='all'?' with agents in this stage':'')+'.</div>';return h}
   cs.forEach(c=>{const pc=c.overallPass>=80?'var(--green)':c.overallPass>=50?'var(--amber)':'var(--red)';
-    h+='<div class="ccard"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="ccard-title">'+c.name+'</div><div class="ccard-meta">'+(c.env?pill(c.env,'#1d9e75')+' ':'')+'<span>'+c.agentCount+' agent'+(c.agentCount!==1?'s':'')+'</span>'+(c.journeyCount>0?'<span>'+c.journeyCount+' journey'+(c.journeyCount!==1?'s':'')+'</span>':'')+'<span>'+c.totalRuns+' runs</span><span>Overall: <strong style="color:'+pc+'">'+c.overallPass+'%</strong></span></div></div></div>';
+    h+='<div class="ccard"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="ccard-title">'+c.name+'</div><div class="ccard-meta">'+(c.env?pill(c.env,'#1d9e75')+' ':'')+'<span>'+c.agentCount+' agent'+(c.agentCount!==1?'s':'')+'</span>'+(c.journeyCount>0?'<span>'+c.journeyCount+' journey'+(c.journeyCount!==1?'s':'')+'</span>':'')+'<span>'+c.totalRuns+' runs</span><span>Overall: <strong style="color:'+pc+'">'+c.overallPass+'%</strong></span>'+(c.jiraKey?'<a href="https://screenmagic-dev.atlassian.net/browse/'+c.jiraKey+'" target="_blank" style="font-size:11px;color:#185fa5;text-decoration:none">'+c.jiraKey+' \u2197</a>':'')+'</div></div></div>';
     c.journeyList.forEach(j=>{const jpc=j.passRate>=80?'var(--green)':j.passRate>=50?'var(--amber)':'var(--red)';const jst=SM[j.stage]||SM.testing;
       h+='<div class="jcard"><div class="jcard-head"><div style="display:flex;gap:8px;align-items:center"><div class="jcard-title">\u2728 '+j.name+'</div>'+pill(j.agents.length+' agent'+(j.agents.length!==1?'s':''),'#534ab7')+'</div><div style="display:flex;gap:8px;align-items:center">'+pill(jst.label,jst.color)+' <span class="jcard-meta">Pass: <strong style="color:'+jpc+'">'+j.passRate+'%</strong></span></div></div>';
       const sa=filter==='all'?j.agents:j.agents.filter(a=>a.stage===filter);sa.forEach(a=>{h+=agentRow(a)});h+='</div>'});
@@ -105,17 +106,16 @@ function renderDetail(){
   const a=agents.find(x=>x.id===selAgent);if(!a){selAgent=null;return renderList()}const st=SM[a.stage]||SM.testing;
   let h='<button class="back" onclick="selAgent=null;render()">\u2190 Back to '+a.client+'</button>';
   h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px"><div><div class="dtitle">'+a.name+'</div><div class="dclient">'+a.client+(a.journey?' \u00B7 Journey: '+a.journey:'')+'</div></div>'+pill(st.label,st.color)+'</div>';
-  h+='<div class="dpills">'+pill(a.channel||'?',a.channel==='Voice'?'#534ab7':'#185fa5')+' '+(a.agentType?pill(a.agentType,'#534ab7')+' ':'')+(a.env?pill(a.env,'#1d9e75')+' ':'')+pill('#'+a.agentId,'#888')+' '+(a.promptLink?'<a href="'+a.promptLink+'" target="_blank" style="font-size:11px;color:#185fa5">Prompt doc</a>':'')+'</div>';
+  h+='<div class="dpills">'+pill(a.channel||'?',a.channel==='Voice'?'#534ab7':'#185fa5')+' '+(a.agentType?pill(a.agentType,'#534ab7')+' ':'')+(a.env?pill(a.env,'#1d9e75')+' ':'')+pill('#'+a.agentId,'#888')+' '+(a.promptLink?'<a href="'+a.promptLink+'" target="_blank" style="font-size:11px;color:#185fa5">Prompt doc</a> ':'')+(a.jiraKey?'<a href="https://screenmagic-dev.atlassian.net/browse/'+a.jiraKey+'" target="_blank" style="font-size:11px;color:#185fa5">Jira: '+a.jiraKey+' \u2197</a>':'')+'</div>';
   h+=timeline(a.stage);h+='<div class="slabels">'+STAGES.map(s=>'<span>'+s.label+'</span>').join('')+'</div>';
   h+='<div class="stitle">Test summary</div><div class="mgrid">';h+=mc('Total runs',a.total)+mc('Passed',a.passed,0,0,'pa')+mc('Partial',a.partial,0,0,'pf')+mc('Failed',a.failed,0,0,'fa');
   h+='<div class="mc'+(a.passRate<50?' w':'')+'"><div class="mv'+(a.passRate<50?' w':'')+'">'+a.passRate+'%</div><div class="ml">Pass rate</div></div></div>';
   var ttKeys=Object.keys(a.testTypeCounts);
   if(ttKeys.length>0){
-    var colors={'Happy Path':'var(--green)','Edge Case':'var(--blue)','Error Handling':'var(--amber)','Guardrail':'var(--red)','Regression':'var(--purple)'};
     h+='<div class="stitle">Test coverage</div><div style="margin-bottom:18px">';
     var allTypes=['Happy Path','Edge Case','Error Handling','Guardrail','Regression'];
-    allTypes.forEach(function(tt){var cnt=a.testTypeCounts[tt]||0;var pct=a.total>0?Math.round(cnt/a.total*100):0;var clr=colors[tt]||'var(--gray)';
-      h+='<div class="fb-row"><span class="fb-label">'+tt+'</span><div class="fb-bar"><div class="fb-fill" style="width:'+Math.min(pct,100)+'%;background:'+clr+'"></div></div><span class="fb-count">'+cnt+' ('+pct+'%)</span></div>'});
+    allTypes.forEach(function(tt){var cnt=a.testTypeCounts[tt]||0;var pct=a.total>0?Math.round(cnt/a.total*100):0;
+      h+='<div class="fb-row"><span class="fb-label">'+tt+'</span><div class="fb-bar"><div class="fb-fill" style="width:'+Math.min(pct,100)+'%;background:var(--purple)"></div></div><span class="fb-count">'+cnt+' ('+pct+'%)</span></div>'});
     h+='</div>';
   }
   if(a.versionList.length>1){h+='<div class="stitle">Version trend</div><div style="margin-bottom:18px">';
