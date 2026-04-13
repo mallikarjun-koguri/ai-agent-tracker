@@ -45,7 +45,7 @@ strong{font-weight:600}.fb-row{display:flex;align-items:center;gap:8px;margin-bo
 <script>
 const STAGES=[{id:"requirement",label:"Requirement",color:"#9c9a92"},{id:"configuration",label:"Configuration",color:"#534ab7"},{id:"testing",label:"Testing",color:"#185fa5"},{id:"tuning",label:"Tuning",color:"#1d9e75"},{id:"live",label:"Live",color:"#639922"},{id:"monitoring",label:"Monitoring",color:"#d85a30"}];
 const SM=Object.fromEntries(STAGES.map(s=>[s.id,s]));
-let SHEET_URL=localStorage.getItem('sheetUrl')||'https://docs.google.com/spreadsheets/d/e/2PACX-1vSzb5OdO3vimOIds13p_oxmloshXDygHmun7m8TPb46WetWR9fHW-f_OULE6kg2A/pub?gid=0&single=true&output=csv';
+let SHEET_URL=localStorage.getItem('sheetUrl')||'https://docs.google.com/spreadsheets/d/e/2PACX-1vSzb5OdO3vimOIds13p_oxmloshXDygHmun73sEhaAGRcqsBxkXm8TPb46WetWR9fHW-f_OULE6kg2A/pub?gid=0&single=true&output=csv';
 let agents=[],customers=[],filter='all',selAgent=null,lastRefresh=null,error=null;
 function parseCSV(t){const ls=t.split('\n');if(ls.length<2)return[];const hs=csvLine(ls[0]);const rs=[];for(let i=1;i<ls.length;i++){if(!ls[i].trim())continue;const vs=csvLine(ls[i]);const o={};hs.forEach((h,j)=>{o[h.trim()]=(vs[j]||'').trim()});rs.push(o)}return rs}
 function csvLine(l){const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(q){if(ch==='"'&&l[i+1]==='"'){c+='"';i++}else if(ch==='"')q=false;else c+=ch}else{if(ch==='"')q=true;else if(ch===','){r.push(c);c=''}else c+=ch}}r.push(c);return r}
